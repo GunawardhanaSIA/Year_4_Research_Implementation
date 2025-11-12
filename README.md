@@ -1,7 +1,7 @@
 # 1. Clone the repository
 
 ```bash
-git clone https://github.com/GunawardhanaSIA/Research---Year-4.git
+git clone https://github.com/GunawardhanaSIA/Year_4_Research_Implementation.git
 ```
 ```bash
 cd Research---Year-4
