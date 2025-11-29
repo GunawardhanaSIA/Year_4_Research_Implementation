@@ -1,5 +1,6 @@
 import AuthenticationScene from "./scenes/AuthenticationScene.js";
 import LevelScene from "./scenes/LevelScene.js";
+import LoginScene from "./scenes/Authentication/LoginScene.js";
 import MenuScene from "./scenes/MenuScene.js";
 import PConversation from "./scenes/Psound/PConversation.js";
 import PSound from "./scenes/Psound/PSound.js";
@@ -8,13 +9,18 @@ import SLevel from "./scenes/Ssound/SLevels.js";
 import SSound from "./scenes/Ssound/SSound.js";
 import SWord from "./scenes/Ssound/SWord.js";
 import TitleScene from "./scenes/TitleScene.js";
+import RegisterScene from "./scenes/Authentication/RegisterScene.js";
 
 // import RexUIPlugin from './plugins/phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    scale: {
+        mode: Phaser.Scale.RESIZE,   
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     backgroundColor: "#fefefe",
     parent: 'game-container',
     physics: {
@@ -41,7 +47,9 @@ const config = {
         SConversation,
         SWord,
         AuthenticationScene,
-        LevelScene
+        LevelScene,
+        LoginScene,
+        RegisterScene
     ],
 };
 

@@ -7,8 +7,14 @@ export default class TitleScene extends Phaser.Scene {
 
   preload() {
     // Load assets
-    this.load.video('background', 'assets/videos/bg-with-title.mp4');
+    this.load.video('background', 'assets/videos/forest-bg.mp4');
     this.load.audio('bgmusic', 'assets/audio/bg-music.mp3');
+    this.load.image('logo', 'assets/images/logo.png');
+    this.load.image('start-btn', 'assets/images/start-btn.png');
+    this.load.spritesheet('riko', 'assets/spritesheets/riko-waving.png', {
+      frameWidth: 235,
+      frameHeight: 273
+    });
   }
 
   create() {
@@ -23,50 +29,93 @@ export default class TitleScene extends Phaser.Scene {
     background.setDepth(-1);
     this.handleVideoScaling(background);
 
-    // Add game title
-    // this.add.text(this.width / 2, this.height / 2 - 100, 'Tiny Talks', {
-    //   fontSize: '80px',
-    //   fontStyle: 'bold',
-    //   color: '#805389',
-    //   stroke: '#ffffff',
-    //   strokeThickness: 10
-    // }).setOrigin(0.5);
+    const logo = this.add.image(this.width / 2, this.height / 2 - 100, 'logo');
+    logo.setScale(0.65);
+
+    const startBtn = this.add.image(this.width / 2, this.height / 2 + 220, 'start-btn')
+    .setScale(0.3)
+    .setInteractive({ useHandCursor: true });
+
+    // Hover: make bigger
+    startBtn.on('pointerover', () => {
+        this.tweens.add({
+            targets: startBtn,
+            scale: 0.32,
+            duration: 150,
+            ease: 'Power1'
+        });
+    });
+
+    // Hover out: shrink back
+    startBtn.on('pointerout', () => {
+        this.tweens.add({
+            targets: startBtn,
+            scale: 0.3,
+            duration: 150,
+            ease: 'Power1'
+        });
+    });
+
+    // Click: animate and go to login page
+    startBtn.on('pointerdown', () => {
+        this.tweens.add({
+            targets: startBtn,
+            scale: 0.32,
+            duration: 100,
+            yoyo: true,
+            ease: 'Power1',
+            onComplete: () => {
+                this.scene.start('LoginScene');   
+            }
+        });
+    });
+
+    this.anims.create({
+      key: 'riko-wave',
+      frames: this.anims.generateFrameNumbers('riko', { start: 3, end: 6 }),
+      frameRate: 4,
+      repeat: -1
+    });
+
+    this.riko = this.add.sprite(this.width / 2 - 220, this.height / 2 + 190, 'riko');
+    this.riko.play('riko-wave');
+    this.riko.setScale(1);
 
 
 
     // start button with rexUI
-    const startButton = this.rexUI.add.label({
-        x: this.width / 2,
-        y: this.height / 2 + 150,
+    // const startButton = this.rexUI.add.label({
+    //     x: this.width / 2,
+    //     y: this.height / 20 * 15,
 
-        background: this.rexUI.add
-            .roundRectangle(0, 0, 200, 700, 20, 0x805389)
-            .setStrokeStyle(2, 0xffffff), 
+    //     background: this.rexUI.add
+    //         .roundRectangle(0, 0, 200, 700, 25, 0x805389)
+    //         .setStrokeStyle(2, 0xffffff), 
 
-        text: this.add.text(0, 0, 'Start Game', {
-            fontSize: '24px',
-            color: '#ffffff',
-            fontFamily: "Comic Relief",
-            letterSpacing: 1,
-            fontStyle: 'bold'
-        }).setShadow(1, 2, '#9d9d9d', 3, true, true),
+    //     text: this.add.text(0, 0, 'Start Game', {
+    //         fontSize: '24px',
+    //         color: '#ffffff',
+    //         fontFamily: "Comic Relief",
+    //         letterSpacing: 2,
+    //         fontStyle: 'bold'
+    //     }).setShadow(1, 2, '#9d9d9d', 3, true, true),
 
-        space: { left: 20, right: 20, top: 15, bottom: 15 }
-    })
-    .layout() // ✅ This is essential — positions and sizes all internal elements
-    .setInteractive()
-    .on('pointerdown', () => {
-        this.cameras.main.fadeOut(500, 255, 255, 255);
-        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-            this.scene.start('AuthenticationScene');
-        });
-    })
-    .on('pointerover', () => {
-        startButton.getElement('background').setFillStyle(0x9963a0);
-    })
-    .on('pointerout', () => {
-        startButton.getElement('background').setFillStyle(0x805389);
-    });
+    //     space: { left: 20, right: 20, top: 15, bottom: 15 }
+    // })
+    // .layout()
+    // .setInteractive()
+    // .on('pointerdown', () => {
+    //     this.cameras.main.fadeOut(500, 255, 255, 255);
+    //     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+    //         this.scene.start('LoginScene');
+    //     });
+    // })
+    // .on('pointerover', () => {
+    //     startButton.getElement('background').setFillStyle(0x9963a0);
+    // })
+    // .on('pointerout', () => {
+    //     startButton.getElement('background').setFillStyle(0x805389);
+    // });
 
     
 
@@ -74,10 +123,10 @@ export default class TitleScene extends Phaser.Scene {
     this.cameras.main.fadeIn(500, 255, 255, 255);
 
     // Play background music
-    this.sound.play('bgmusic', {
-      volume: 0.5,
-      loop: true
-    });
+    // this.sound.play('bgmusic', {
+    //   volume: 0.5,
+    //   loop: true
+    // });
   }
 
 
