@@ -6,8 +6,17 @@ export default class MenuScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("bg", "assets/images/bg-menu.jpg");
-        this.load.video('bg-plain', 'assets/videos/bg-plain.mp4')
+        this.load.video('background', 'assets/videos/forest-bg.mp4');
+        this.load.image('word-card', 'assets/images/wood-card.png');
+        this.load.image('profile-icon', 'assets/images/profile-icon.png');
+        this.load.image('logout-icon', 'assets/images/logout-icon.png');
+        this.load.image('consonant-card', 'assets/images/consonant-card.png');
+        this.load.image('vowel-card', 'assets/images/vowel-card.png');
+        this.load.image('letter-selection', 'assets/images/letter-selection.png');
+        this.load.spritesheet('riko-thinking', 'assets/spritesheets/riko-thinking.png', {
+            frameWidth: 274,
+            frameHeight: 263
+        });
     }
 
     create() {
@@ -15,7 +24,7 @@ export default class MenuScene extends Phaser.Scene {
         this.height = this.scale.height;
 
         // Add background video
-        const background = this.add.video(this.width/2, this.height/2, 'bg-plain');
+        const background = this.add.video(this.width/2, this.height/2, 'background');
         this.cameras.main.fadeIn(2000, 255, 255, 255)
         background.setMute(true);
         background.play(true);
@@ -28,42 +37,60 @@ export default class MenuScene extends Phaser.Scene {
         const consonants = ['S','C','D','F','G'];
 
         // Create cards using graphics
-        this.createCard(this.width/4, this.height/2, 'Vowels', vowels); 
-        this.createCard((this.width/4)*3, this.height/2, 'Consonants', consonants); 
+        this.createCard(this.width/4, this.height/2, 'vowel-card', vowels); 
+        this.createCard((this.width/4)*3, this.height/2, 'consonant-card', consonants); 
+
+        this.anims.create({
+            key: 'riko-thinking',
+            frames: this.anims.generateFrameNumbers('riko-thinking', { start: 4, end: 36 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.riko = this.add.sprite(this.width / 2 + 75, this.height / 2 + 150, 'riko-thinking');
+        this.riko.play('riko-thinking');
+        this.riko.setScale(1);
+
+        this.thinkingText = this.add.image(this.width / 2 - 80, this.height / 2 - 25, 'letter-selection');
+        this.thinkingText.setScale(0.2);
+
+        // Profile button
+        const profileIcon = this.add.image(this.width - 113, 40, 'profile-icon')
+        .setScale(0.1)
+        .setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => {
+                this.cameras.main.fadeOut(500, 255, 255, 255);
+                this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                    this.scene.start('LevelScene'); 
+                });
+            })
+        .on('pointerover', () => profileIcon.setAlpha(0.7))
+        .on('pointerout', () => profileIcon.setAlpha(1));
+
+
+        //Logout button
+        const logoutIcon = this.add.image(this.width - 45, 40, 'logout-icon')
+        .setScale(0.1)
+        .setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => {
+                this.cameras.main.fadeOut(500, 255, 255, 255);
+                this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                    this.scene.start('LevelScene'); 
+                });
+            })
+        .on('pointerover', () => logoutIcon.setAlpha(0.7))
+        .on('pointerout', () => logoutIcon.setAlpha(1));
     }
 
 
 
-    createCard(x, y, title, letters) {
-        const cardWidth = this.width / 2.5;
-        const cardHeight = this.height * 3/4; 
-        const buttonSize = 65;  
+    createCard(x, y, cardName, letters) {
+        const buttonSize = 90;  
         const cols = 3;         // number of columns in grid
-        const spacing = 15;
+        const spacing = 25;
 
-        const card = this.add.graphics();
-        card.fillStyle(0xffffff, 0.8); 
-        card.fillRoundedRect(x - cardWidth / 2, y - cardHeight / 2, cardWidth, cardHeight, 20);
-
-        // Card Border
-        card.lineStyle(4, 0xffffff, 0.4);
-        card.strokeRoundedRect(x - cardWidth / 2, y - cardHeight / 2, cardWidth, cardHeight, 20);
-
-        // Title Text
-        const cardTitle = this.add.text(
-            x,                     
-            y - cardHeight/2 + 30, 
-            title,
-            {
-                fontSize: '28px',
-                color: '#805389',
-                fontStyle: 'bold',
-                fontFamily: "Comic Relief",
-                letterSpacing: 1,
-                stroke: '#ffffff',
-                strokeThickness: 3
-            }
-        ).setOrigin(0.5).setShadow(1, 2, '#9d9d9d', 3, true, true);
+        const card = this.add.image(x, y, cardName);
+        card.setScale(0.55);
 
         // Calculate rows based on letters
         const rows = Math.ceil(letters.length / cols);
@@ -75,36 +102,32 @@ export default class MenuScene extends Phaser.Scene {
         // Starting point to center the grid inside the card
         const startX = x - gridWidth / 2;
 
+        const cardHeight = card.displayHeight;
+        const startY = y - gridHeight / 2;
+
         // Grid of buttons
         letters.forEach((letter, index) => {
             const col = index % cols;
             const row = Math.floor(index / cols);
 
             const buttonX = startX + col * (buttonSize + spacing) + buttonSize / 2;
-            const buttonY = y - cardHeight/2 + 80 + row * (buttonSize + spacing) + buttonSize/2;
+            const buttonY = startY + row * (buttonSize + spacing);
 
             // Button background
-            const buttonBg = this.add.graphics();
-            buttonBg.fillStyle(0xfff5d6, 1);
-            buttonBg.fillRoundedRect(buttonX - buttonSize/2, buttonY - buttonSize/2, buttonSize, buttonSize, 20);
-            buttonBg.lineStyle(2, 0xfade88);
-            buttonBg.strokeRoundedRect(buttonX - buttonSize/2, buttonY - buttonSize/2, buttonSize, buttonSize, 20);
-
+            const buttonBg = this.add.image(buttonX, buttonY, 'word-card');
+            buttonBg.setDisplaySize(buttonSize, buttonSize); // Optional
+            buttonBg.setOrigin(0.5);
+            
             // Letter text
             const buttonText = this.add.text(buttonX, buttonY, letter, {
-                fontSize: '36px',
-                color: '#fade88',
+                fontSize: '40px',
+                color: '#E8FF1C',
                 fontStyle: 'bold',
                 fontFamily: "Comic Relief",
-                stroke: '#ffffff',
-                strokeThickness: 3
-            }).setOrigin(0.5);
+            }).setOrigin(0.5).setShadow(4, 4, '#333333', 2, false, true);
 
             // Make button interactive
-            buttonBg.setInteractive(
-                new Phaser.Geom.Rectangle(buttonX - buttonSize/2, buttonY - buttonSize/2, buttonSize, buttonSize), 
-                Phaser.Geom.Rectangle.Contains
-            ) 
+            buttonBg.setInteractive({ useHandCursor: true }) 
             .on('pointerdown', () => {
                 this.cameras.main.fadeOut(500, 255, 255, 255);
                 this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {

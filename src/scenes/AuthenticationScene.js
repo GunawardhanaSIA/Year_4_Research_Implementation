@@ -51,51 +51,54 @@ export default class AuthenticationScene extends Phaser.Scene {
         .setShadow(1, 2, '#9d9d9d', 3, true, true);
 
 
+        // Store text reference for button
+        this.actionButtonText = this.add.text(0, 0, 'Log In', {
+            fontSize: '16px',
+            color: '#ffffff',
+            fontFamily: "Comic Relief",
+            letterSpacing: 1,
+            fontStyle: 'bold'
+        }).setShadow(1, 2, '#9d9d9d', 3, true, true);
+
         this.actionButton = this.rexUI.add.label({
             x: this.width / 2,
             y: this.height / 2 + 100,
-
-            background: this.rexUI.add
-                .roundRectangle(0, 0, 300, 80, 20, 0x805389),
-
-            text: this.add.text(0, 0, 'Log in', {
-                fontSize: '16px',
-                color: '#ffffff',
-                fontFamily: "Comic Relief",
-                letterSpacing: 1,
-                fontStyle: 'bold'
-            }).setShadow(1, 2, '#9d9d9d', 3, true, true),
-
+            background: this.rexUI.add.roundRectangle(0, 0, 300, 80, 20, 0x805389),
+            text: this.actionButtonText,
             space: { left: 35, right: 35, top: 15, bottom: 15 },
         })
-        .layout() 
+        .layout()
         .setInteractive()
         .on('pointerdown', () => {
             const username = document.getElementById('usernameInput').value;
             const password = document.getElementById('passwordInput').value;
+            const age = document.getElementById('ageSelect').value;
             console.log('Username:', username);
             console.log('Password:', password);
+            console.log('Age:', age);
 
             document.getElementById('login-form').style.display = 'none';
-
             this.scene.start('MenuScene');
+        });
+
+
+        // Store text reference for toggle button
+        this.toggleButtonText = this.add.text(0, 0, 'Don\'t have an account ?', {
+            fontSize: '16px',
+            color: '#9d9d9d',
+            fontFamily: "Comic Relief",
+            letterSpacing: 1,
         });
 
         this.toggleButton = this.rexUI.add.label({
             x: this.width / 2,
             y: this.height / 2 + 150,
-
-            text: this.add.text(0, 0, 'Don\'t have an account ?', {
-                fontSize: '16px',
-                color: '#9d9d9d',
-                fontFamily: "Comic Relief",
-                letterSpacing: 1,
-            })
+            text: this.toggleButtonText
         })
-        .layout() 
+        .layout()
         .setInteractive()
         .on('pointerdown', () => {
-            this.toggleAuthMode()
+            this.toggleAuthMode();
         });
     }
 
@@ -134,16 +137,18 @@ export default class AuthenticationScene extends Phaser.Scene {
 
         if (this.isRegisterMode) {
             this.cardTitle.setText('Register');
-            this.actionButton.list[1].setText('Register');
-            this.toggleButton.list[1].setText('Back to Login');
+            this.actionButtonText.setText('Register'); // Use direct reference
+            this.toggleButtonText.setText('Back to Login'); // Use direct reference
             document.getElementById('usernameInput').placeholder = 'Enter email';
             document.getElementById('passwordInput').placeholder = 'Create password';
+            document.getElementById('ageSelect').style.display = 'block';
         } else {
             this.cardTitle.setText('Log In');
-            this.actionButton.list[1].setText('Login');
-            this.toggleButton.list[1].setText('Register');
+            this.actionButtonText.setText('Log In');
+            this.toggleButtonText.setText('Register');
             document.getElementById('usernameInput').placeholder = 'Enter username';
             document.getElementById('passwordInput').placeholder = 'Enter password';
+            document.getElementById('ageSelect').style.display = 'none';
         }
     }
 
@@ -191,11 +196,38 @@ export default class AuthenticationScene extends Phaser.Scene {
         passwordInput.style.marginBottom = '15px';
         passwordInput.style.padding = '5px 10px';
         passwordInput.style.borderRadius = '20px';  
-        passwordInput.style.border  = '1px solid #9d9d9d';  
+        passwordInput.style.border  = '1px solid #9d9d9d'; 
+        
+        // Age dropdown
+        const ageSelect = document.createElement('select');
+        ageSelect.id = 'ageSelect';
+        ageSelect.style.width = '100%';
+        ageSelect.style.height = '40px';
+        ageSelect.style.fontSize = '20px';
+        ageSelect.style.fontFamily = 'Comic Relief';
+        ageSelect.style.fontWeight = 'bold';
+        ageSelect.style.color = '#805389';
+        ageSelect.style.letterSpacing = '1px';
+        ageSelect.style.marginBottom = '15px';
+        ageSelect.style.padding = '5px 10px';
+        ageSelect.style.borderRadius = '20px';
+        ageSelect.style.border = '1px solid #9d9d9d';
+
+        // Add options 3 to 8
+        for (let i = 3; i <= 8; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.text = i;
+            ageSelect.appendChild(option);
+        }
+
+        // Hide by default (only show in Register mode)
+        ageSelect.style.display = 'none';
 
         // Append inputs to form div
         formDiv.appendChild(usernameInput);
         formDiv.appendChild(passwordInput);
+        formDiv.appendChild(ageSelect);
 
         // Append form to body
         document.body.appendChild(formDiv);
