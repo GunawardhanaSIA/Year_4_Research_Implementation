@@ -17,7 +17,9 @@ export default class LSoundGame extends Phaser.Scene {
         this.load.image("l-balloon4", "assets/images/l-balloon4.png");
         this.load.image("l-balloon5", "assets/images/l-balloon5.png");
         this.load.image('riko-raising-hand', 'assets/images/riko-raising-hand.png');
+        this.load.image('riko-sad', 'assets/images/riko-sad.png');
         this.load.image('star', 'assets/images/star.png');
+        this.load.image('l-letter-card', 'assets/images/l-letter-card.png');
     }
 
     create() {
@@ -54,11 +56,17 @@ export default class LSoundGame extends Phaser.Scene {
 
         this.currentBalloonIndex = 0;
         this.isReleasing = false;
+        this.activeCard = null;
+        this.cardTimer = null;
+        this.pendingBalloon = null;
+
+        this.riko = this.add.image(this.width / 2, this.height - 160, 'riko-raising-hand')
+        .setScale(0.38)
+        .setDepth(1);
+        this.riko.setVisible(false);
 
         this.startCountdown(() => {
-            const RikoRaisingHand = this.add.image(this.width / 2, this.height - 160, 'riko-raising-hand')
-            .setScale(0.38)
-            .setDepth(1);
+            this.riko.setVisible(true);
 
             this.createBalloons(); 
             this.startBalloons(); 
@@ -160,11 +168,74 @@ export default class LSoundGame extends Phaser.Scene {
             .setInteractive();
 
             balloon.on('pointerdown', () => {
-                this.popBalloon(balloon);
+                if (balloon.floatTween) {
+                    balloon.floatTween.pause(); //  pause movement
+                }
+                
+                this.tweens.add({
+                    targets: this.dimOverlay,
+                    duration: 200
+                });
+
+                this.showLetterCard(balloon);
             });
 
             this.balloons.push(balloon);
         }
+    }
+
+
+    showLetterCard(balloon) {
+        let cardClicked = false;
+
+        // Show the card
+        const card = this.add.image(
+            this.scale.width / 2,
+            this.scale.height / 2,
+            'l-letter-card'
+        )
+        .setScale(0.5)
+        .setDepth(10)
+        .setInteractive();
+
+        // If card is clicked
+        card.on('pointerdown', () => {
+            cardClicked = true;
+            card.destroy();
+            this.popBalloon(balloon);
+        });
+
+        this.time.delayedCall(5000, () => {
+            if (!cardClicked) {
+                card.destroy();
+
+                // Resume balloon floating
+                if (balloon.floatTween) {
+                    balloon.floatTween.resume();
+                }
+            }
+        });
+    }
+
+
+
+    removeLetterCard(isCorrect) {
+        if (!this.activeCard) return;
+
+        // Stop timer
+        if (this.cardTimer) {
+            this.cardTimer.remove();
+            this.cardTimer = null;
+        }
+
+        this.activeCard.destroy();
+        this.activeCard = null;
+
+        if (isCorrect && this.pendingBalloon) {
+            this.popBalloon(this.pendingBalloon);
+        }
+
+        this.pendingBalloon = null;
     }
 
 
@@ -180,7 +251,10 @@ export default class LSoundGame extends Phaser.Scene {
         const balloon = this.balloons[this.currentBalloonIndex];
         this.isReleasing = true;
 
-        this.tweens.add({
+        // Riko becomes happy when a new balloon starts
+        this.setRikoHappy();
+
+        balloon.floatTween = this.tweens.add({
             targets: balloon,
             y: -60,
             duration: 10000,
@@ -188,13 +262,22 @@ export default class LSoundGame extends Phaser.Scene {
             onComplete: () => {
                 if (balloon.active) {
                     balloon.destroy();
+
+                    // Balloon was NOT popped
+                    this.setRikoSad();
                 }
+
                 this.currentBalloonIndex++;
                 this.isReleasing = false;
-                this.releaseNextBalloon();
+
+                // Small pause before next balloon
+                this.time.delayedCall(800, () => {
+                    this.releaseNextBalloon();
+                });
             }
         });
     }
+
 
 
     popBalloon(balloon) {
@@ -219,6 +302,16 @@ export default class LSoundGame extends Phaser.Scene {
                 }
             }
         });
+    }
+
+
+    setRikoSad() {
+    this.riko.setTexture('riko-sad');
+    }
+
+
+    setRikoHappy() {
+        this.riko.setTexture('riko-raising-hand');
     }
 
 
