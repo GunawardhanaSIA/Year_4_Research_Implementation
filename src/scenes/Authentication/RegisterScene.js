@@ -113,6 +113,38 @@ export default class RegisterScene extends Phaser.Scene {
         this.welcomeText.setScale(0.17);
     }
 
+
+    async handleRegister() {
+        const username = document.getElementById('usernameInput').value;
+        const password = document.getElementById('passwordInput').value;
+        const age = document.getElementById('ageSelect').value;
+
+        console.log('Registering user:', { username, password, age });
+
+        try {
+            const response = await fetch('http://localhost:5000/api/users/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, age })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.message || "Registration failed");
+                return;   
+            }
+
+            console.log('Registration successful:', data);
+            localStorage.setItem('jwt', data.token);
+            document.getElementById('register-form').style.display = 'none';
+
+            this.scene.start('MenuScene');
+        } catch (error) {
+            console.error('Error during registration:', error);
+        }
+    }
+
     
     createHtmlInputs() {
         // Create container div for login form

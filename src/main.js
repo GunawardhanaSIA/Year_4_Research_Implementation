@@ -10,6 +10,13 @@ import SSound from "./scenes/Ssound/SSound.js";
 import SWord from "./scenes/Ssound/SWord.js";
 import TitleScene from "./scenes/TitleScene.js";
 import RegisterScene from "./scenes/Authentication/RegisterScene.js";
+import LLevelScene from "./scenes/Lsound/LLevelScene.js";
+import LSoundInstrScene from "./scenes/Lsound/SoundGame/LSoundInstrScene.js";
+import LSoundGame from "./scenes/Lsound/SoundGame/LSoundGame.js";
+import LWordInstrScene from "./scenes/Lsound/WordGame/LWordInstrScene.js";
+import LWordGame from "./scenes/Lsound/WordGame/LWordGame.js";
+import LSentenceGame from "./scenes/Lsound/SentenceGame/LSentenceGame.js";
+import LSentenceInstrScene from "./scenes/Lsound/SentenceGame/LSentenceInstrScene.js";
 
 // import RexUIPlugin from './plugins/phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
@@ -41,15 +48,20 @@ const config = {
         TitleScene,
         MenuScene,
         PSound,
-        SSound, 
-        SLevel,
+        LSoundGame, 
+        LWordInstrScene,
         PConversation,
         SConversation,
         SWord,
         AuthenticationScene,
         LevelScene,
         LoginScene,
-        RegisterScene
+        RegisterScene,
+        LLevelScene,
+        LSoundInstrScene,
+        LWordGame,
+        LSentenceGame,
+        LSentenceInstrScene
     ],
 };
 

@@ -82,43 +82,6 @@ export default class TitleScene extends Phaser.Scene {
     this.riko.setScale(1);
 
 
-
-    // start button with rexUI
-    // const startButton = this.rexUI.add.label({
-    //     x: this.width / 2,
-    //     y: this.height / 20 * 15,
-
-    //     background: this.rexUI.add
-    //         .roundRectangle(0, 0, 200, 700, 25, 0x805389)
-    //         .setStrokeStyle(2, 0xffffff), 
-
-    //     text: this.add.text(0, 0, 'Start Game', {
-    //         fontSize: '24px',
-    //         color: '#ffffff',
-    //         fontFamily: "Comic Relief",
-    //         letterSpacing: 2,
-    //         fontStyle: 'bold'
-    //     }).setShadow(1, 2, '#9d9d9d', 3, true, true),
-
-    //     space: { left: 20, right: 20, top: 15, bottom: 15 }
-    // })
-    // .layout()
-    // .setInteractive()
-    // .on('pointerdown', () => {
-    //     this.cameras.main.fadeOut(500, 255, 255, 255);
-    //     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-    //         this.scene.start('LoginScene');
-    //     });
-    // })
-    // .on('pointerover', () => {
-    //     startButton.getElement('background').setFillStyle(0x9963a0);
-    // })
-    // .on('pointerout', () => {
-    //     startButton.getElement('background').setFillStyle(0x805389);
-    // });
-
-    
-
     // Fade in effect
     this.cameras.main.fadeIn(500, 255, 255, 255);
 

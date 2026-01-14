@@ -3,7 +3,7 @@ export default class SidePanel {
      * @param {Phaser.Scene} scene - The current scene
      * @param {string} topic - The topic text to display at the top of the panel
      */
-    constructor(scene, topic = "s  /s/") {
+    constructor(scene, topic = "") {
         this.scene = scene;
         this.topic = topic; // Dynamic topic
         this.panelWidth = 80; 
@@ -66,40 +66,42 @@ export default class SidePanel {
         const centerY = this.panelY + this.panelHeight * 0.1; // 5% from top of panel
 
         // Bigger letter (e.g., "s")
-        this.bigLetter = this.scene.add.text(
-            centerX - 5, // slightly left to adjust spacing
+        this.topicText = this.scene.add.text(
+            centerX, // slightly left to adjust spacing
             centerY,
-            "s",
+            this.topic,
             {
-                fontSize: "36px",
+                fontSize: "32px",
                 fontStyle: "bold",
-                color: "#9d9d9d",
+                color: "#626060",
                 fontFamily: "Arial"
             }
-        ).setOrigin(1, 0.5);
+        ).setOrigin(0.5);
 
         // Smaller phoneme (e.g., "/s/")
-        this.smallLetter = this.scene.add.text(
-            centerX - 22 + this.bigLetter.width,
-            centerY,
-            "/s/",
-            {
-                fontSize: "24px",
-                fontStyle: "bold",
-                color: "#9d9d9d",
-                fontFamily: "Arial"
-            }
-        ).setOrigin(0, 0.5);
+        // this.smallLetter = this.scene.add.text(
+        //     centerX - 22 + this.bigLetter.width,
+        //     centerY,
+        //     "/s/",
+        //     {
+        //         fontSize: "24px",
+        //         fontStyle: "bold",
+        //         color: "#9d9d9d",
+        //         fontFamily: "Arial"
+        //     }
+        // ).setOrigin(0, 0.5);
 
-        this.bigLetter.setDepth(11);
-        this.smallLetter.setDepth(11);
+        this.topicText.setDepth(11);
+        // this.smallLetter.setDepth(11);
     }
 
-    setTopic(bigLetter, phoneme) {
-        this.bigLetter.setText(bigLetter);
-        this.smallLetter.setText(phoneme);
+    setTopic(newTopic) {
+        this.topic = newTopic;
+        this.topicText.setText(newTopic);
+        // this.bigLetter.setText(bigLetter);
+        // this.smallLetter.setText(phoneme);
         // Reposition the smallLetter next to bigLetter
-        this.smallLetter.x = this.bigLetter.x + this.bigLetter.width;
+        // this.smallLetter.x = this.bigLetter.x + this.bigLetter.width;
     }
 
     createButtons() {
@@ -169,7 +171,7 @@ export default class SidePanel {
 
     quitGame() {
         if (confirm("Are you sure you want to quit?")) {
-            this.scene.scene.start("MainMenuScene"); // Redirect to main menu
+            this.scene.scene.start("LevelScene"); // Redirect to main menu
         }
     }
 }
