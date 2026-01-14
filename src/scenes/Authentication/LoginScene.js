@@ -133,6 +133,7 @@ export default class LoginScene extends Phaser.Scene {
             //     return;   
             // }
 
+            // console.log('Login successful:', data);
             // localStorage.setItem('jwt', data.token);
             // document.getElementById('login-form').style.display = 'none';
 
