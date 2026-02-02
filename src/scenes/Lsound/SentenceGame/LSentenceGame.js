@@ -11,16 +11,16 @@ export default class LSentenceGame extends Phaser.Scene {
         this.load.image("pause", "assets/icons/pause.png");
         this.load.image("settings", "assets/icons/settings.png");
         this.load.image("quit", "assets/icons/back.png");
-        this.load.image("house", "assets/images/house.png");
-        this.load.image("tree", "assets/images/tree.png");
-        this.load.image("flower", "assets/images/flower.png");
-        this.load.image("cub", "assets/images/cub.png");
-        this.load.image("bird", "assets/images/bird.png");
-        this.load.image("house-colored", "assets/images/house-colored.png");
-        this.load.image("tree-colored", "assets/images/tree-colored.png");
-        this.load.image("flower-colored", "assets/images/flower-colored.png");
-        this.load.image("cub-colored", "assets/images/cub-colored.png");
-        this.load.image("bird-colored", "assets/images/bird-colored.png");
+        this.load.image("easy-1", "assets/images/easy-1.png");
+        this.load.image("easy-2", "assets/images/easy-2.png");
+        this.load.image("easy-3", "assets/images/easy-3.png");
+        this.load.image("easy-4", "assets/images/easy-4.png");
+        this.load.image("easy-5", "assets/images/easy-5.png");
+        this.load.image("easy-colored-1", "assets/images/easy-colored-1.png");
+        this.load.image("easy-colored-2", "assets/images/easy-colored-2.png");
+        this.load.image("easy-colored-3", "assets/images/easy-colored-3.png");
+        this.load.image("easy-colored-4", "assets/images/easy-colored-4.png");
+        this.load.image("easy-colored-5", "assets/images/easy-colored-5.png");
         this.load.image("riko-sent-game", "assets/images/riko-sent-game.png");
         this.load.spritesheet('riko-jumping', 'assets/spritesheets/riko-jumping.png', {
             frameWidth: 280,
@@ -69,45 +69,34 @@ export default class LSentenceGame extends Phaser.Scene {
         this.startMic();
 
         this.startCountdown(() => {
-            this.riko = this.add.image(this.width * 0.2, this.height * 0.75, 'riko-sent-game')
-            .setScale(0.2)
+            this.riko = this.add.image(this.width * 0.775, this.height * 0.75, 'riko-sent-game')
+            .setScale(0.25)
             .setDepth(1);
 
-            this.currentSentenceIndex = 0;
-
-            this.sentences = [
-                "The little lion likes leaves.",
-                "Lily lost her yellow ball.",
-                "Look at the blue balloon.",
-                "The lamp is on the table.",
-                "The girl loves lemons."
-            ];
-
-            this.drawSentence(this.sentences[this.currentSentenceIndex]);
-
-            const pictureLayouts = [
-                { x: this.width * 0.1, y: this.height * 0.5, scale: 0.11 },
-                { x: this.width * 0.5, y: this.height * 0.55,  scale: 0.12 },
-                { x: this.width * 0.75, y: this.height * 0.75,  scale: 0.05 },
-                { x: this.width * 0.95, y: this.height * 0.35, scale: 0.06 },
-                { x: this.width * 0.94, y: this.height * 0.75,  scale: 0.035 },
-            ];
-
+            this.coloredCount = 0;
             this.pictures = [];
-            this.picNames = ["tree", "house", "cub", "bird", "flower"];
+            this.picNames = ["easy-1", "easy-2", "easy-3", "easy-4", "easy-5"];
 
-            const startX = this.width / 2 - 240;
-            const y = this.height / 2 + 50;
-            const gap = 120;
+            const startX = this.width * 0.23;
+            const topRowY = this.height * 0.25;
+            const bottomRowY = this.height * 0.75;
+            const gap = 425; // space between pictures
 
-            for (let i = 0; i < 5; i++) {
-                const layout = pictureLayouts[i];
+            for (let i = 0; i < this.picNames.length; i++) {
+                const isTopRow = i < 3;
+                const rowIndex = isTopRow ? i : i - 3;
 
-                const pic = this.add.image(
-                    layout.x,
-                    layout.y,
-                    this.picNames[i]
-                ).setScale(layout.scale);
+                const x = startX + rowIndex * gap;
+                const y = isTopRow ? topRowY : bottomRowY;
+
+                const pic = this.add.image(x, y, this.picNames[i])
+                    .setScale(0.54)
+                    .setInteractive({ useHandCursor: true });
+
+                pic.index = i;
+                pic.isColored = false;
+
+                pic.on("pointerdown", () => this.colorPicture(pic));
 
                 this.pictures.push(pic);
             }
@@ -115,87 +104,43 @@ export default class LSentenceGame extends Phaser.Scene {
     }
 
 
-    drawSentence(sentence) {
-        // Clear previous sentence letters
-        if (this.sentenceLetters) {
-            this.sentenceLetters.forEach(l => l.destroy());
+    colorPicture(pic) {
+        if (pic.isColored) return;
+
+        pic.setTexture(`easy-colored-${pic.index + 1}`);
+        pic.isColored = true;
+        this.coloredCount++;
+
+        // pop animation
+        this.tweens.add({
+            targets: pic,
+            scale: pic.scale + 0.05,
+            duration: 150,
+            yoyo: true
+        });
+
+        if (this.coloredCount === this.pictures.length) {
+            this.playRikoJump();
         }
-
-        this.sentenceLetters = [];
-
-        const y = 60;
-        let totalWidth = 0;
-
-        // Measure total width
-        const tempLetters = [];
-        sentence.split("").forEach(char => {
-            const t = this.add.text(0, 0, char, {
-                fontSize: "36px",
-                fontFamily: "Inter",
-                fontStyle: "bold"
-            });
-            totalWidth += t.width;
-            tempLetters.push(t);
-        });
-        tempLetters.forEach(t => t.destroy());
-
-        let x = this.width / 2 - totalWidth / 2;
-
-        // Draw colored letters
-        sentence.split("").forEach(char => {
-            const isL = char.toLowerCase() === "l";
-
-            const letter = this.add.text(x, y, char, {
-                fontSize: "36px",
-                fontFamily: "Inter",
-                fontStyle: "bold",
-                color: isL ? "#e53935" : "#686767"
-            })
-            .setOrigin(0, 0.5)
-            .setInteractive({ useHandCursor: true });
-
-            letter.on("pointerdown", () => {
-                this.onSentencePressed();
-            });
-
-            x += letter.width;
-            this.sentenceLetters.push(letter);
-        });
     }
 
 
-    onSentencePressed() {
-        if (this.currentSentenceIndex >= this.pictures.length) return;
-
-        const index = this.currentSentenceIndex;
-
-        // Color the correct picture
-        this.pictures[index].setTexture(
-            `${this.picNames[index]}-colored`
-        );
-
-        this.currentSentenceIndex++;
-
-        // Update sentence
-        if (this.currentSentenceIndex < this.sentences.length) {
-            this.drawSentence(
-                this.sentences[this.currentSentenceIndex]
-            );
-        } else {
-            this.drawSentence("Great job! ⭐");
+    playRikoJump() {
+        if (this.riko) {
             this.riko.destroy();
-
-            this.riko = this.add.sprite(
-                this.width * 0.25,
-                this.height * 0.75,
-                'riko-jumping'
-            )
-            .setScale(0.75)
-            .setDepth(1);
-
-            this.riko.play('rikoJump');
         }
+
+        this.riko = this.add.sprite(
+            this.width * 0.8,
+            this.height * 0.75,
+            'riko-jumping'
+        )
+        .setScale(0.9)
+        .setDepth(1);
+
+        this.riko.play('rikoJump');
     }
+
 
 
     startMic() {
