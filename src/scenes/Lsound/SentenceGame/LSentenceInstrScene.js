@@ -5,9 +5,14 @@ export default class LSentenceInstrScene extends Phaser.Scene {
         this.height = 0;
     }
 
+    init(data) {
+        this.selectedTheme = data.selectedTheme;
+    }
+
 
     preload() {
         this.load.image('forest-bg', 'assets/images/forest-bg.png');
+        this.load.image('beach-bg', 'assets/images/beach-bg.png');
         this.load.image('profile-icon', 'assets/images/profile-btn.png');
         this.load.image('logout-icon', 'assets/images/logout-btn.png');
         this.load.image('back-to-map', 'assets/images/back-to-map.png');
@@ -26,7 +31,15 @@ export default class LSentenceInstrScene extends Phaser.Scene {
         this.width = this.scale.width;
         this.height = this.scale.height;
 
-        const background = this.add.image(0, 0, 'forest-bg')
+        let bgKey = 'forest-bg'; 
+
+        if (this.selectedTheme === 'beach') {
+            bgKey = 'beach-bg';
+        } else if (this.selectedTheme === 'forest') {
+            bgKey = 'forest-bg';
+        }
+
+        const background = this.add.image(0, 0, bgKey)
             .setOrigin(0, 0)
             .setDepth(-10);
 
@@ -99,7 +112,9 @@ export default class LSentenceInstrScene extends Phaser.Scene {
                 yoyo: true,
                 ease: 'Power1',
                 onComplete: () => {
-                    this.scene.start('LSentenceGame');   
+                    this.scene.start('LSentenceGame', {
+                        selectedTheme: this.selectedTheme
+                    });   
                 }
             });
         });

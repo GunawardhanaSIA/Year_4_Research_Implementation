@@ -5,8 +5,13 @@ export default class LWordGame extends Phaser.Scene {
         super("LWordGame");
     }
 
+    init(data) {
+        this.selectedTheme = data.selectedTheme;
+    }
+
     preload() {
         this.load.image('ground', 'assets/images/ground.png');
+        this.load.image('night-beach', 'assets/images/night-beach.png');
         this.load.audio("start", "assets/audio/lets-go.mp3");
         this.load.image("pause", "assets/icons/pause.png");
         this.load.image("settings", "assets/icons/settings.png");
@@ -20,6 +25,7 @@ export default class LWordGame extends Phaser.Scene {
         this.load.image("leaf", "assets/images/leaf.png");
         this.load.image("lamp", "assets/images/lamp.png");
         this.load.image("apple", "assets/images/apple.png");
+        this.load.image("silver-star", "assets/images/silver-star.png");
     }
 
     create() {
@@ -27,7 +33,15 @@ export default class LWordGame extends Phaser.Scene {
         this.width = this.scale.width;
         this.height = this.scale.height;
 
-        const background = this.add.image(0, 0, 'ground')
+        let bgKey = 'forest-bg'; 
+
+        if (this.selectedTheme === 'beach') {
+            bgKey = 'night-beach';
+        } else if (this.selectedTheme === 'forest') {
+            bgKey = 'forest-bg';
+        }
+
+        const background = this.add.image(0, 0, bgKey)
             .setOrigin(0, 0)
             .setDepth(-10);
 
@@ -53,10 +67,6 @@ export default class LWordGame extends Phaser.Scene {
         this.startMic();
 
         this.startCountdown(() => {
-            this.Tree = this.add.image(this.width / 3, this.height / 2 - 30, 'apple-tree')
-            .setScale(0.9)
-            .setDepth(1);
-
             this.rikoWithBasket = this.physics.add.image(this.width / 4, this.height - 130, 'riko-with-basket')
             .setScale(0.3)
             .setDepth(1);
@@ -82,66 +92,164 @@ export default class LWordGame extends Phaser.Scene {
                 this.wordButtons.push(btn);
             });
 
-            this.apples = this.physics.add.group();
+            // this.apples = this.physics.add.group();
+
+            // for (let i = 0; i < 5; i++) {
+            //     const randomX = Phaser.Math.Between(
+            //         this.Tree.x - 250,   
+            //         this.Tree.x + 250      
+            //     );
+
+            //     const randomY = Phaser.Math.Between(
+            //         this.Tree.y / 3,      // upper branches
+            //         this.Tree.y - 40      // lower branches
+            //     );
+
+            //     const apple = this.apples.create(randomX, randomY, 'apple')
+            //         .setScale(0.012)
+            //         .setDepth(2);
+
+            //     apple.body.setAllowGravity(false);
+            //     this.physics.world.enable(apple);
+            //     this.apples.add(apple);
+            // }
+
+            // Decide object type based on theme
+            const objectKey = this.selectedTheme === 'beach' ? 'silver-star' : 'apple';
+
+            this.collectibles = this.physics.add.group();
 
             for (let i = 0; i < 5; i++) {
-                const randomX = Phaser.Math.Between(
-                    this.Tree.x - 250,   
-                    this.Tree.x + 250      
-                );
+                let randomX;
+                let randomY;
 
-                const randomY = Phaser.Math.Between(
-                    this.Tree.y / 3,      // upper branches
-                    this.Tree.y - 40      // lower branches
-                );
+                if (this.selectedTheme === 'beach') {
+                    randomX = Phaser.Math.Between(100, this.width / 3);
+                    randomY = Phaser.Math.Between(50, this.height / 2);
+                } else {
+                    this.Tree = this.add.image(this.width / 3, this.height / 2 - 30, 'apple-tree')
+                        .setScale(0.9)
+                        .setDepth(-1);
 
-                const apple = this.apples.create(randomX, randomY, 'apple')
-                    .setScale(0.012)
+                    randomX = Phaser.Math.Between(
+                        this.Tree.x - 250,
+                        this.Tree.x + 250
+                    );
+
+                    randomY = Phaser.Math.Between(
+                        this.Tree.y / 3,
+                        this.Tree.y - 40
+                    );
+                }
+
+                const item = this.collectibles.create(randomX, randomY, objectKey)
+                    .setScale(this.selectedTheme === 'beach' ? 0.04 : 0.012)
                     .setDepth(2);
 
-                apple.body.setAllowGravity(false);
-                this.physics.world.enable(apple);
-                this.apples.add(apple);
+                item.body.setAllowGravity(false);
             }
-            
-            this.physics.add.overlap(this.rikoWithBasket, this.apples.getChildren(), this.handleRikoAppleCollision, null, this);
+
+            // this.physics.add.overlap(this.rikoWithBasket, this.apples.getChildren(), this.handleRikoAppleCollision, null, this);
+            this.physics.add.overlap(
+                this.rikoWithBasket,
+                this.collectibles,
+                this.handleRikoAppleCollision,
+                null,
+                this
+            );
         });
     }
 
 
-    // Handle clicking a word
     onWordClick(index) {
-        const apples = this.apples.getChildren();
-        const apple = apples[index];
-        if (!apple) return;
 
-        const targetX = apple.x; // store x BEFORE movement
+    const items = this.collectibles.getChildren();
+    const item = items[index];
+    if (!item) return;
 
-        // Enable gravity
-        apple.body.setAllowGravity(true);
-        apple.body.setVelocityX(0); // safety
+    const targetX = item.x;
 
-        // Apple fall
+    // Disable button
+    this.wordButtons[index].disableInteractive();
+
+    // 🌳 FOREST → Apple falls
+    if (this.selectedTheme === 'forest') {
+
+        item.body.setAllowGravity(true);
+        item.body.setVelocityX(0);
+
         this.tweens.add({
-            targets: apple,
+            targets: item,
             y: this.height - 130,
             duration: 800,
             ease: 'Linear',
             onComplete: () => {
-                apple.destroy();   
+                item.destroy();
             }
         });
 
-        // Move Riko under apple
+    }
+
+    // 🌴 BEACH → Star floats down gently
+    else if (this.selectedTheme === 'beach') {
+
         this.tweens.add({
-            targets: this.rikoWithBasket,
-            x: targetX,
-            duration: 600,
-            ease: 'Power2'
+            targets: item,
+            y: this.height - 200,
+            alpha: 0,
+            duration: 800,
+            ease: 'Sine.easeInOut',
+            onComplete: () => {
+                item.destroy();
+            }
         });
 
-        this.wordButtons[index].disableInteractive();
     }
+
+    // Move Riko under object (works for both)
+    this.tweens.add({
+        targets: this.rikoWithBasket,
+        x: targetX,
+        duration: 600,
+        ease: 'Power2'
+    });
+}
+
+
+
+    // Handle clicking a word
+    // onWordClick(index) {
+    //     const apples = this.apples.getChildren();
+    //     const apple = apples[index];
+    //     if (!apple) return;
+
+    //     const targetX = apple.x; // store x BEFORE movement
+
+    //     // Enable gravity
+    //     apple.body.setAllowGravity(true);
+    //     apple.body.setVelocityX(0); // safety
+
+    //     // Apple fall
+    //     this.tweens.add({
+    //         targets: apple,
+    //         y: this.height - 130,
+    //         duration: 800,
+    //         ease: 'Linear',
+    //         onComplete: () => {
+    //             apple.destroy();   
+    //         }
+    //     });
+
+    //     // Move Riko under apple
+    //     this.tweens.add({
+    //         targets: this.rikoWithBasket,
+    //         x: targetX,
+    //         duration: 600,
+    //         ease: 'Power2'
+    //     });
+
+    //     this.wordButtons[index].disableInteractive();
+    // }
 
 
 

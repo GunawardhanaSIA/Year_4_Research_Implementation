@@ -160,7 +160,9 @@ export default class LLevelScene extends Phaser.Scene {
                     .on('pointerdown', () => {
                         this.cameras.main.fadeOut(1000, 255, 255, 255);
                         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-                            this.scene.start(`L${btn.levelName}InstrScene`);
+                            this.scene.start('LThemeScene', {
+                                selectedLevel: btn.levelName
+                            });
                         });
                     })
                     .on('pointerover', () => btn.setAlpha(0.7).setScale(0.19))

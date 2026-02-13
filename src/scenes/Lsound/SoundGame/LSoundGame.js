@@ -5,8 +5,14 @@ export default class LSoundGame extends Phaser.Scene {
         super("LSoundGame");
     }
 
+    init(data) {
+        this.selectedTheme = data.selectedTheme;
+    }
+
     preload() {
-        this.load.video('background', 'assets/videos/forest-bg.mp4');
+        // this.load.video('background', 'assets/videos/forest-bg.mp4');
+        this.load.image('forest-bg', 'assets/images/forest-bg.png');
+        this.load.image('beach-bg', 'assets/images/beach-bg.png');
         this.load.audio("start", "assets/audio/lets-go.mp3");
         this.load.image("pause", "assets/icons/pause.png");
         this.load.image("settings", "assets/icons/settings.png");
@@ -19,7 +25,8 @@ export default class LSoundGame extends Phaser.Scene {
         this.load.image('riko-raising-hand', 'assets/images/riko-raising-hand.png');
         this.load.image('riko-sad', 'assets/images/riko-sad.png');
         this.load.image('star', 'assets/images/star.png');
-        this.load.image('l-letter-card', 'assets/images/l-letter-card.png');
+        this.load.image('forest-letter-card', 'assets/images/forest-letter-card.png');
+        this.load.image('beach-letter-card', 'assets/images/beach-letter-card.png');
     }
 
     create() {
@@ -34,20 +41,41 @@ export default class LSoundGame extends Phaser.Scene {
 
 
         // Background
-        const bg = this.add.video(this.scale.width / 2, this.scale.height / 2, "background");
-        bg.setDisplaySize(this.scale.width, this.scale.height);
-        this.scaleVideoToFullScreen(bg);
-        bg.play(true);
-        bg.setLoop(true);
-        bg.setDepth(-1);
+        // const bg = this.add.video(this.scale.width / 2, this.scale.height / 2, "background");
+        // bg.setDisplaySize(this.scale.width, this.scale.height);
+        // this.scaleVideoToFullScreen(bg);
+        // bg.play(true);
+        // bg.setLoop(true);
+        // bg.setDepth(-1);
 
-        bg.once("play", () => {
-            this.scaleVideoToFullScreen(bg);
-        });
+        // bg.once("play", () => {
+        //     this.scaleVideoToFullScreen(bg);
+        // });
 
-        this.scale.on("resize", () => {
-            this.scaleVideoToFullScreen(bg);
-        });
+        // this.scale.on("resize", () => {
+        //     this.scaleVideoToFullScreen(bg);
+        // });
+
+        let bgKey = 'forest-bg'; 
+
+        if (this.selectedTheme === 'beach') {
+            bgKey = 'beach-bg';
+        } else if (this.selectedTheme === 'forest') {
+            bgKey = 'forest-bg';
+        }
+
+        const background = this.add.image(0, 0, bgKey)
+            .setOrigin(0, 0)
+            .setDepth(-10);
+
+        // Correct way to get texture width/height
+        const bgPicWidth = background.texture.getSourceImage().width;
+        const bgPicHeight = background.texture.getSourceImage().height;
+
+        // Scale to fit screen
+        const scale = Math.max(this.width / bgPicWidth, this.height / bgPicHeight);
+
+        background.setScale(scale);
 
         this.sidePanel = new LSidePanel(this);
         this.sidePanel.setTopic("L /l/");
@@ -189,10 +217,18 @@ export default class LSoundGame extends Phaser.Scene {
         let cardClicked = false;
 
         // Show the card
+        let cardKey = 'forest-letter-card'; 
+
+        if (this.selectedTheme === 'beach') {
+            cardKey = 'beach-letter-card';
+        } else if (this.selectedTheme === 'forest') {
+            cardKey = 'forest-letter-card';
+        }
+
         const card = this.add.image(
             this.scale.width / 2,
             this.scale.height / 2,
-            'l-letter-card'
+            cardKey
         )
         .setScale(0.5)
         .setDepth(10)

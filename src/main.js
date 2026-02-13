@@ -16,6 +16,7 @@ import LWordGame from "./scenes/Lsound/WordGame/LWordGame.js";
 import LSentenceGame from "./scenes/Lsound/SentenceGame/LSentenceGame.js";
 import LSentenceInstrScene from "./scenes/Lsound/SentenceGame/LSentenceInstrScene.js";
 import LProgressGraphScene from "./scenes/Lsound/LProgressGraph.js";
+import LThemeScene from "./scenes/Lsound/LThemeScene.js";
 
 // import RexUIPlugin from './plugins/phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
@@ -47,8 +48,6 @@ const config = {
         TitleScene,
         MenuScene,
         PSound,
-        LSoundGame, 
-        LWordInstrScene,
         PConversation,
         SConversation,
         SWord,
@@ -57,11 +56,14 @@ const config = {
         LoginScene,
         RegisterScene,
         LLevelScene,
+        LSoundGame, 
+        LWordInstrScene,
         LSoundInstrScene,
         LWordGame,
         LSentenceGame,
         LSentenceInstrScene,
-        LProgressGraphScene
+        LProgressGraphScene,
+        LThemeScene
     ],
 };
 
