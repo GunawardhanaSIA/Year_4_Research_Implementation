@@ -5,22 +5,37 @@ export default class LSentenceGame extends Phaser.Scene {
         super("LSentenceGame");
     }
 
+    init(data) {
+        this.selectedTheme = data.selectedTheme;
+    }
+
     preload() {
         this.load.image('ground', 'assets/images/ground.png');
+        this.load.image('beach-bg', 'assets/images/beach-bg.png');
         this.load.audio("start", "assets/audio/lets-go.mp3");
         this.load.image("pause", "assets/icons/pause.png");
         this.load.image("settings", "assets/icons/settings.png");
         this.load.image("quit", "assets/icons/back.png");
-        this.load.image("easy-1", "assets/images/easy-1.png");
-        this.load.image("easy-2", "assets/images/easy-2.png");
-        this.load.image("easy-3", "assets/images/easy-3.png");
-        this.load.image("easy-4", "assets/images/easy-4.png");
-        this.load.image("easy-5", "assets/images/easy-5.png");
-        this.load.image("easy-colored-1", "assets/images/easy-colored-1.png");
-        this.load.image("easy-colored-2", "assets/images/easy-colored-2.png");
-        this.load.image("easy-colored-3", "assets/images/easy-colored-3.png");
-        this.load.image("easy-colored-4", "assets/images/easy-colored-4.png");
-        this.load.image("easy-colored-5", "assets/images/easy-colored-5.png");
+        this.load.image("forest-easy-1", "assets/images/forest-easy-1.png");
+        this.load.image("forest-easy-2", "assets/images/forest-easy-2.png");
+        this.load.image("forest-easy-3", "assets/images/forest-easy-3.png");
+        this.load.image("forest-easy-4", "assets/images/forest-easy-4.png");
+        this.load.image("forest-easy-5", "assets/images/forest-easy-5.png");
+        this.load.image("forest-easy-colored-1", "assets/images/forest-easy-colored-1.png");
+        this.load.image("forest-easy-colored-2", "assets/images/forest-easy-colored-2.png");
+        this.load.image("forest-easy-colored-3", "assets/images/forest-easy-colored-3.png");
+        this.load.image("forest-easy-colored-4", "assets/images/forest-easy-colored-4.png");
+        this.load.image("forest-easy-colored-5", "assets/images/forest-easy-colored-5.png");
+        this.load.image("beach-easy-1", "assets/images/beach-easy-1.png");
+        this.load.image("beach-easy-2", "assets/images/beach-easy-2.png");
+        this.load.image("beach-easy-3", "assets/images/beach-easy-3.png");
+        this.load.image("beach-easy-4", "assets/images/beach-easy-4.png");
+        this.load.image("beach-easy-5", "assets/images/beach-easy-5.png");
+        this.load.image("beach-easy-colored-1", "assets/images/beach-easy-colored-1.png");
+        this.load.image("beach-easy-colored-2", "assets/images/beach-easy-colored-2.png");
+        this.load.image("beach-easy-colored-3", "assets/images/beach-easy-colored-3.png");
+        this.load.image("beach-easy-colored-4", "assets/images/beach-easy-colored-4.png");
+        this.load.image("beach-easy-colored-5", "assets/images/beach-easy-colored-5.png");
         this.load.image("riko-sent-game", "assets/images/riko-sent-game.png");
         this.load.spritesheet('riko-jumping', 'assets/spritesheets/riko-jumping.png', {
             frameWidth: 280,
@@ -33,9 +48,18 @@ export default class LSentenceGame extends Phaser.Scene {
         this.width = this.scale.width;
         this.height = this.scale.height;
 
-        const background = this.add.image(0, 0, 'ground')
+        let bgKey = 'ground'; 
+
+        if (this.selectedTheme === 'beach') {
+            bgKey = 'beach-bg';
+        } else if (this.selectedTheme === 'forest') {
+            bgKey = 'ground';
+        }
+
+        const background = this.add.image(0, 0, bgKey)
             .setOrigin(0, 0)
             .setDepth(-10);
+
 
         // Correct way to get texture width/height
         const bgPicWidth = background.texture.getSourceImage().width;
@@ -89,7 +113,7 @@ export default class LSentenceGame extends Phaser.Scene {
                 const x = startX + rowIndex * gap;
                 const y = isTopRow ? topRowY : bottomRowY;
 
-                const pic = this.add.image(x, y, this.picNames[i])
+                const pic = this.add.image(x, y, `${this.selectedTheme}-${this.picNames[i]}`)
                     .setScale(0.54)
                     .setInteractive({ useHandCursor: true });
 
@@ -107,7 +131,7 @@ export default class LSentenceGame extends Phaser.Scene {
     colorPicture(pic) {
         if (pic.isColored) return;
 
-        pic.setTexture(`easy-colored-${pic.index + 1}`);
+        pic.setTexture(`${this.selectedTheme}-easy-colored-${pic.index + 1}`);
         pic.isColored = true;
         this.coloredCount++;
 

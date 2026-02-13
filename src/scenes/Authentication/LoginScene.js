@@ -110,7 +110,7 @@ export default class LoginScene extends Phaser.Scene {
 
 
         this.welcomeText = this.add.image(this.width / 2 - 370, this.height / 2 + 70, 'welcome-back');
-        this.welcomeText.setScale(0.17);
+        this.welcomeText.setScale(0.4);
     }
 
 

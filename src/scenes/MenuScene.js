@@ -51,8 +51,8 @@ export default class MenuScene extends Phaser.Scene {
         this.riko.play('riko-thinking');
         this.riko.setScale(1);
 
-        this.thinkingText = this.add.image(this.width / 2 - 80, this.height / 2 - 25, 'letter-selection');
-        this.thinkingText.setScale(0.2);
+        this.thinkingText = this.add.image(this.width / 2 - 80, this.height / 2, 'letter-selection');
+        this.thinkingText.setScale(0.45);
 
 
         // Profile button

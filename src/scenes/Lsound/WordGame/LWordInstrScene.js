@@ -5,9 +5,14 @@ export default class LWordInstrScene extends Phaser.Scene {
         this.height = 0;
     }
 
+    init(data) {
+        this.selectedTheme = data.selectedTheme;
+    }
+
 
     preload() {
         this.load.image('forest-bg', 'assets/images/forest-bg.png');
+        this.load.image('night-beach', 'assets/images/night-beach.png');
         this.load.image('profile-icon', 'assets/images/profile-btn.png');
         this.load.image('logout-icon', 'assets/images/logout-btn.png');
         this.load.image('back-to-map', 'assets/images/back-to-map.png');
@@ -16,6 +21,7 @@ export default class LWordInstrScene extends Phaser.Scene {
         this.load.image('Sentence-btn', 'assets/images/level-3.png');
         this.load.image('L-banner', 'assets/images/L-banner.png');
         this.load.image('riko-with-apple-basket', 'assets/images/riko-with-apple-basket.png');
+        this.load.image('riko-with-star-basket', 'assets/images/riko-with-star-basket.png');
         this.load.image('instr-l-word', 'assets/images/instr-l-word.png');
         this.load.image('play-btn', 'assets/images/play-btn.png');
     }
@@ -26,7 +32,15 @@ export default class LWordInstrScene extends Phaser.Scene {
         this.width = this.scale.width;
         this.height = this.scale.height;
 
-        const background = this.add.image(0, 0, 'forest-bg')
+        let bgKey = 'forest-bg'; 
+
+        if (this.selectedTheme === 'beach') {
+            bgKey = 'night-beach';
+        } else if (this.selectedTheme === 'forest') {
+            bgKey = 'forest-bg';
+        }
+
+        const background = this.add.image(0, 0, bgKey)
             .setOrigin(0, 0)
             .setDepth(-10);
 
@@ -54,8 +68,16 @@ export default class LWordInstrScene extends Phaser.Scene {
         .on('pointerout', () => backToMapBtn.setAlpha(1));
 
 
-        const RikoWithLBalloons = this.add.image(this.width / 2.8, this.height - 200, 'riko-with-apple-basket')
-        .setScale(0.45)
+        let rikoKey = 'riko-with-apple-basket'; 
+
+        if (this.selectedTheme === 'beach') {
+            rikoKey = 'riko-with-star-basket';
+        } else if (this.selectedTheme === 'forest') {
+            rikoKey = 'riko-with-apple-basket';
+        }
+
+        const RikoWithBasket = this.add.image(this.width / 2.7, this.height - 200, rikoKey)
+        .setScale(0.38)
         .setDepth(1);
 
 
@@ -99,7 +121,9 @@ export default class LWordInstrScene extends Phaser.Scene {
                 yoyo: true,
                 ease: 'Power1',
                 onComplete: () => {
-                    this.scene.start('LWordGame');   
+                    this.scene.start('LWordGame', {
+                        selectedTheme: this.selectedTheme
+                    });    
                 }
             });
         });
